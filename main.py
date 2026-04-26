@@ -66,14 +66,23 @@ print("\n Fichiers exportés (CSV + Excel)")
 # 5. Graphique — sauvegardé en PNG
 
 plt.figure(figsize=(9, 5))
-bars = plt.bar(df['ID'].astype(str), df['CA_Net'], color='skyblue', edgecolor='white')
-plt.title("Chiffre d'Affaires Net par Produit", fontsize=14, fontweight='bold')
+
+# Barres
+bars = plt.bar(df['ID'].astype(str), df['CA_Net'])
+
+# Titre et axes
+plt.title("Chiffre d'Affaires Net par Produit", fontsize=14)
 plt.xlabel("ID Produit")
 plt.ylabel("CA Net (€)")
-plt.bar_label(bars, fmt='%.2f', fontsize=9)
-plt.grid(axis='y', linestyle='--', alpha=0.3)
+
+# Affichage des valeurs
+plt.bar_label(bars, fmt='%.2f')
+
+# Grille
+plt.grid(axis='y', linestyle='--', alpha=0.5)
+
 plt.tight_layout()
 
+# Sauvegarde + affichage
 plt.savefig('graphique.png', dpi=150)
-print(" Graphique sauvegardé : graphique.png")
-plt.close()
+plt.show()
