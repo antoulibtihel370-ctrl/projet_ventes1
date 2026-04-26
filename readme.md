@@ -25,18 +25,16 @@ Le programme lit un fichier CSV contenant les données de ventes, effectue plusi
 ---
 
 ##  Fonctionnalités
-
-Fonctionnalités
-Lecture du fichier ventes.csv
-Calcul du Chiffre d’Affaires Brut :
+Lecture du fichier **ventes.csv**
+Calcul du Chiffre d’Affaires **Brut** :
 Prix × Quantité
-Calcul du Chiffre d’Affaires Net :
+Calcul du Chiffre d’Affaires Net:
 après application de la remise (%)
 Calcul de la TVA (20%)
 Calcul du CA Total de l’entreprise
-Identification du produit le plus rentable
-Génération automatique du fichier resultats_final.csv 
-Visualisation graphique du CA Net par produit avec Matplotlib
+Identification du **produit le plus rentable**
+Génération automatique du **fichier resultats_final.csv**
+Visualisation graphique du CA Net par produit avec **Matplotlib**
 
 ---
 
