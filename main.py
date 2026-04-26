@@ -1,88 +1,80 @@
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+# traitement.py
+
 import pandas as pd
 import os
 
-# LECTURE DYNAMIQUE — détecte séparateur et taille
+TVA_RATE = 0.20
 
-def lire_csv_dynamique(nom_fichier):
 
-    # Vérifier que le fichier existe
-    if not os.path.exists(nom_fichier):
-        print(f" Fichier '{nom_fichier}' introuvable !")
-        return None
+def charger_donnees(fichier):
+    """
+    Charge et valide le fichier CSV.
+    """
+    if not os.path.exists(fichier):
+        raise FileNotFoundError(f"Fichier {fichier} introuvable.")
 
-    # Détecter automatiquement le séparateur (; ou ,)
-    with open(nom_fichier, "r", encoding="utf-8") as f:
-        premiere_ligne = f.readline()
-        separateur = ';' if ';' in premiere_ligne else ','
+    df = pd.read_csv(fichier)
 
-    # Lire le fichier avec pandas
-    df = pd.read_csv(nom_fichier, sep=separateur)
+    if df.empty:
+        raise ValueError("Fichier vide.")
 
-    # Infos sur le fichier
-    taille = os.path.getsize(nom_fichier)
-    print(f"\n Fichier      : {nom_fichier}")
-    print(f" Taille       : {taille} octets")
-    print(f" Séparateur   : '{separateur}'")
-    print(f" Colonnes     : {list(df.columns)}")
-    print(f" Nb de lignes : {len(df)}")
+    colonnes = {'ID', 'Prix', 'Quantite', 'Remise'}
+    if not colonnes.issubset(df.columns):
+        raise ValueError("Colonnes manquantes.")
+
+    # Conversion des types
+    df['Prix'] = pd.to_numeric(df['Prix'], errors='coerce')
+    df['Quantite'] = pd.to_numeric(df['Quantite'], errors='coerce')
+    df['Remise'] = pd.to_numeric(df['Remise'], errors='coerce')
+
+    # Vérification valeurs invalides
+    if df[['Prix','Quantite','Remise']].isnull().any().any():
+        raise ValueError("Données invalides (valeurs non numériques).")
+
+    if (df[['Prix','Quantite','Remise']] < 0).any().any():
+        raise ValueError("Valeurs négatives interdites.")
+
+    if (df['Remise'] > 100).any():
+        raise ValueError("Remise > 100% invalide.")
 
     return df
 
-# 1. Lire le fichier CSV (dynamique)
-df = lire_csv_dynamique('ventes.csv')
 
-if df is None:
-    exit()  # Arrêter si fichier introuvable
+def calculer_indicateurs(df):
+    """
+    Calcule CA Brut, CA Net et TVA.
+    """
+    df['CA_Brut'] = df['Prix'] * df['Quantite']
+    df['CA_Net'] = df['CA_Brut'] * (1 - df['Remise'] / 100)
+    df['TVA'] = df['CA_Net'] * TVA_RATE
+    return df
 
-# 2. Calculs
 
-df['CA_Brut'] = df['Prix'] * df['Quantite']
-df['CA_Net']  = df['CA_Brut'] * (1 - df['Remise'] / 100)
-df['TVA']     = df['CA_Net'] * 0.20
-df = df.round(2)
+def analyser(df):
+    """
+    Analyse les résultats globaux.
+    """
+    if df['CA_Net'].isnull().all():
+        raise ValueError("Impossible de déterminer le produit max.")
 
-# Trier du meilleur CA au pire
-df = df.sort_values(by='CA_Net', ascending=False)
+    ca_total = df['CA_Net'].sum()
+    produit_max = df.loc[df['CA_Net'].idxmax(), 'ID']
 
-# 3. Affichage
+    return ca_total, produit_max
 
-total_ca    = df['CA_Net'].sum()
-top_product = df.iloc[0]['ID']
 
-print("\n===== RÉSULTATS =====")
-print(df.to_string(index=False))
-print(f"\n CA Total            : {total_ca:.2f} €")
-print(f" Meilleur produit ID : {top_product}")
+def traiter_fichier(fichier):
+    """
+    Pipeline complet de traitement.
+    """
+    df = charger_donnees(fichier)
+    df = calculer_indicateurs(df)
+    ca_total, produit_max = analyser(df)
 
-# 4. Export CSV + Excel
+    # Création dossier static si absent
+    os.makedirs("static", exist_ok=True)
 
-df.to_csv('resultats_final.csv', index=False)
-df.to_excel('resultats_final.xlsx', index=False)
-print("\n Fichiers exportés (CSV + Excel)")
+    # Export CSV
+    df.to_csv("static/resultats_final.csv", index=False)
 
-# 5. Graphique — sauvegardé en PNG
-
-plt.figure(figsize=(9, 5))
-
-# Barres
-bars = plt.bar(df['ID'].astype(str), df['CA_Net'])
-
-# Titre et axes
-plt.title("Chiffre d'Affaires Net par Produit", fontsize=14)
-plt.xlabel("ID Produit")
-plt.ylabel("CA Net (€)")
-
-# Affichage des valeurs
-plt.bar_label(bars, fmt='%.2f')
-
-# Grille
-plt.grid(axis='y', linestyle='--', alpha=0.5)
-
-plt.tight_layout()
-
-# Sauvegarde + affichage
-plt.savefig('graphique.png', dpi=150)
-plt.show()
+    return df, ca_total, produit_max
