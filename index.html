@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des Ventes - Dashboard</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            padding: 2.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem 0.75rem;
+        }
+        
+        .table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-color: #e9ecef;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-refresh {
+            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .header-title {
+            color: white;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-5">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1 class="text-center header-title mb-5">
+                    <i class="fas fa-chart-line me-3"></i>
+                    Dashboard Analyse Ventes
+                </h1>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="dashboard-container">
+                    
+                    <!-- Statistiques principales -->
+                    <div class="row mb-5">
+                        <div class="col-md-4 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-euro-sign"></i>
+                                </div>
+                                <div class="stat-value">{{ "{:,.2f}".format(ca_total).replace(',', ' ').replace('.', ',') }} €</div>
+                                <div class="stat-label">Chiffre d'Affaires Total</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="stat-value">#{{ produit_max }}</div>
+                                <div class="stat-label">Meilleur Produit</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file-csv"></i>
+                                </div>
+                                <div class="stat-value">
+                                    <a href="{{ url_for('static', filename='resultats_final.csv') }}" 
+                                       class="text-white text-decoration-none" 
+                                       download>
+                                        <i class="fas fa-download me-2"></i>Télécharger
+                                    </a>
+                                </div>
+                                <div class="stat-label">Résultats Exportés</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton Rafraîchir -->
+                    <div class="text-center mb-4">
+                        <button class="btn btn-primary btn-refresh btn-lg" onclick="location.reload()">
+                            <i class="fas fa-sync-alt me-2"></i>
+                            Rafraîchir les Données
+                        </button>
+                    </div>
+
+                    <!-- Graphique CA par Produit -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <div class="chart-container">
+                                <h3 class="mb-4 text-center">
+                                    <i class="fas fa-chart-bar me-2 text-primary"></i>
+                                    Chiffre d'Affaires par Produit
+                                </h3>
+                                <canvas id="caChart" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tableau des Ventes -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-container">
+                                <h3 class="mb-4">
+                                    <i class="fas fa-table me-2 text-primary"></i>
+                                    Détail des Ventes
+                                </h3>
+                                {{ table|safe }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Configuration du graphique
+        const ctx = document.getElementById('caChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ ids|tojson }},
+                datasets: [{
+                    label: 'Chiffre d\'Affaires Net (€)',
+                    data: {{ ca_values|tojson }},
+                    backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '€' + context.parsed.y.toLocaleString('fr-FR');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '€' + value.toLocaleString('fr-FR');
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)',
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing : 'easeOutQuart',
+                }
+            }
+        });
+
+        // Auto-refresh toutes les 30 secondes (optionnel)
+        // setInterval(() => location.reload(), 30000);
+    </script>
+</body>
+</html>
