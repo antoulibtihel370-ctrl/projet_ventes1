@@ -37,6 +37,22 @@ Génération automatique du **fichier resultats_final.csv**
 Visualisation graphique du CA Net par produit avec **Matplotlib**
 
 ---
+##  Core Computations
+
+**Gross Revenue**
+
+CA_Brut = Prix × Quantité
+
+**Net Revenue**
+
+CA_Net = CA_Brut × (1 - Remise / 100)
+
+**VAT**
+
+TVA = CA_Net × 0.2
+
+----
+
 
 ##  Installation
 
