@@ -3,291 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyse des Ventes - Dashboard</title>
-    
-    <!-- Bootstrap 5 CSS -->
+    <title>Analyse des Ventes PRO - Hors ligne</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://" rel="stylesheet">
-    
     <style>
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
+            --primary: #4CAF50;
+            --secondary: #45a049;
+            --danger: #f44336;
         }
-        
         body {
-            font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
-        
-        .dashboard-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+        }
+        .container-main {
+            max-width: 1400px;
+            margin: 2rem auto;
+        }
+        .card-modern {
+            border: none;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin: 2rem auto;
-            padding: 2.5rem;
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .card-modern:hover {
+            transform: translateY(-10px);
+        }
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
+            border: none;
+            font-weight: 600;
         }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        .stat-big {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
         }
-        
-        .stat-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .chart-container {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        
-        .table-container {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-        
-        .table th {
-            background: var(--primary-color);
-            color: white;
+        .btn-glow {
+            border-radius: 50px;
+            padding: 12px 30px;
             font-weight: 600;
             border: none;
-            padding: 1rem 0.75rem;
-        }
-        
-        .table td {
-            padding: 1rem 0.75rem;
-            vertical-align: middle;
-            border-color: #e9ecef;
-        }
-        
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .btn-refresh {
-            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem 2rem;
-            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
         }
-        
-        .btn-refresh:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        .btn-success-glow { background: linear-gradient(45deg, var(--primary), var(--secondary)); }
+        .btn-success-glow:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(76,175,80,0.4);
         }
-        
-        .header-title {
+        .btn-danger-glow { background: linear-gradient(45deg, var(--danger), #d32f2f); }
+        .table-custom th {
+            background: var(--primary) !important;
             color: white;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: 600;
         }
-        
-        @media (max-width: 768px) {
-            .dashboard-container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-            
-            .stat-value {
-                font-size: 1.5rem;
-            }
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(76,175,80,0.25);
+        }
+        #tableauVentes { max-height: 500px; overflow-y: auto; }
+        .top-produit-item {
+            background: linear-gradient(90deg, #f0f8ff, #e6f3ff);
+            border-left: 5px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        .top-produit-item:hover {
+            background: linear-gradient(90deg, #e3f2fd, #bbdefb);
+            transform: translateX(10px);
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid py-5">
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <h1 class="text-center header-title mb-5">
-                    <i class="fas fa-chart-line me-3"></i>
-                    Dashboard Analyse Ventes
-                </h1>
+
+<div class="header text-center">
+    <h1><i class="fas fa-chart-line me-3"></i>📊 Analyse des Ventes PRO</h1>
+    <p class="lead mb-0">Gestion complète - 100% Hors ligne</p>
+</div>
+
+<div class="container-main">
+    <!-- Statistiques principales -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-modern bg-white text-center p-4">
+                <i class="fas fa-euro-sign fa-3x text-success mb-3"></i>
+                <div class="stat-big" id="caTotal">1 245,67 €</div>
+                <div class="text-muted">CA Total</div>
             </div>
         </div>
-        
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-10">
-                <div class="dashboard-container">
-                    
-                    <!-- Statistiques principales -->
-                    <div class="row mb-5">
-                        <div class="col-md-4 mb-4">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-euro-sign"></i>
-                                </div>
-                                <div class="stat-value">{{ "{:,.2f}".format(ca_total).replace(',', ' ').replace('.', ',') }} €</div>
-                                <div class="stat-label">Chiffre d'Affaires Total</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-trophy"></i>
-                                </div>
-                                <div class="stat-value">#{{ produit_max }}</div>
-                                <div class="stat-label">Meilleur Produit</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-file-csv"></i>
-                                </div>
-                                <div class="stat-value">
-                                    <a href="{{ url_for('static', filename='resultats_final.csv') }}" 
-                                       class="text-white text-decoration-none" 
-                                       download>
-                                        <i class="fas fa-download me-2"></i>Télécharger
-                                    </a>
-                                </div>
-                                <div class="stat-label">Résultats Exportés</div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-modern bg-white text-center p-4">
+                <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
+                <div class="stat-big text-primary" id="topProduit">PROD007</div>
+                <div class="text-muted">Top Produit</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card card-modern bg-white text-center p-4">
+                <i class="fas fa-download fa-3x text-info mb-3"></i>
+                <div class="stat-big">2 156</div>
+                <div class="text-muted">Lignes exportées</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <button class="btn btn-success-glow btn-glow w-100 h-100" onclick="calculerTout()">
+                <i class="fas fa-magic me-2"></i>Rafraîchir
+            </button>
+        </div>
+    </div>
 
-                    <!-- Bouton Rafraîchir -->
-                    <div class="text-center mb-4">
-                        <button class="btn btn-primary btn-refresh btn-lg" onclick="location.reload()">
-                            <i class="fas fa-sync-alt me-2"></i>
-                            Rafraîchir les Données
-                        </button>
+    <div class="row g-4">
+        <!-- Tableau principal -->
+        <div class="col-lg-8">
+            <div class="card card-modern">
+                <div class="card-header-custom p-3">
+                    <i class="fas fa-table me-2"></i>📋 Toutes les Ventes
+                    <span class="badge bg-light text-dark ms-2" id="nbProduits">15</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" id="tableauVentes">
+                        <table class="table table-hover table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Prix (€)</th>
+                                    <th>Qté</th>
+                                    <th>Remise</th>
+                                    <th>CA Brut</th>
+                                    <th>CA Net</th>
+                                    <th>TVA (20%)</th>
+                                    <th><i class="fas fa-cog"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyVentes">
+                                <!-- Données générées par JS -->
+                            </tbody>
+                        </table>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Graphique CA par Produit -->
-                    <div class="row mb-5">
-                        <div class="col-12">
-                            <div class="chart-container">
-                                <h3 class="mb-4 text-center">
-                                    <i class="fas fa-chart-bar me-2 text-primary"></i>
-                                    Chiffre d'Affaires par Produit
-                                </h3>
-                                <canvas id="caChart" height="100"></canvas>
-                            </div>
-                        </div>
+        <!-- Panneau droit -->
+        <div class="col-lg-4">
+            <!-- TOP 5 -->
+            <div class="card card-modern mb-4">
+                <div class="card-header-custom p-3">
+                    <i class="fas fa-star me-2"></i>🏆 TOP 5 Produits
+                </div>
+                <div class="card-body p-3" id="top5">
+                    <!-- Généré par JS -->
+                </div>
+            </div>
+
+            <!-- Historique -->
+            <div class="card card-modern mb-4">
+                <div class="card-header-custom p-3">
+                    <i class="fas fa-history me-2"></i>📜 Historique
+                </div>
+                <div class="card-body p-3" style="max-height: 250px; overflow-y: auto;" id="historique">
+                    <div class="alert alert-info small mb-2">
+                        <i class="fas fa-clock me-2"></i>Dernière analyse : <span id="dateAnalyse"></span>
                     </div>
-
-                    <!-- Tableau des Ventes -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-container">
-                                <h3 class="mb-4">
-                                    <i class="fas fa-table me-2 text-primary"></i>
-                                    Détail des Ventes
-                                </h3>
-                                {{ table|safe }}
-                            </div>
-                        </div>
+                    <div class="small text-muted">
+                        - 15 produits analysés<br>
+                        - CA total : 1 245,67 €<br>
+                        - Fichier prêt au téléchargement
                     </div>
+                </div>
+            </div>
 
+            <!-- Téléchargements -->
+            <div class="card card-modern">
+                <div class="card-header-custom p-3">
+                    <i class="fas fa-download me-2"></i>💾 Téléchargements
+                </div>
+                <div class="card-body text-center p-4">
+                    <button class="btn btn-success-glow btn-glow me-2 mb-2" onclick="exportCSV()">
+                        <i class="fas fa-file-csv me-2"></i>CSV Complet
+                    </button><br>
+                    <button class="btn btn-info btn-glow" onclick="exportJSON()">
+                        <i class="fas fa-file-code me-2"></i>JSON
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <script>
-        // Configuration du graphique
-        const ctx = document.getElementById('caChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ ids|tojson }},
-                datasets: [{
-                    label: 'Chiffre d\'Affaires Net (€)',
-                    data: {{ ca_values|tojson }},
-                    backgroundColor: 'rgba(37, 99, 235, 0.8)',
-                    borderColor: 'rgba(37, 99, 235, 1)',
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return '€' + context.parsed.y.toLocaleString('fr-FR');
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '€' + value.toLocaleString('fr-FR');
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)',
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        }
-                    }
-                },
-                animation: {
-                    duration: 1500,
-                    easing : 'easeOutQuart',
-                }
-            }
-        });
+    <!-- Formulaire ajout -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card card-modern">
+                <div class="card-header-custom p-3">
+                    <i class="fas fa-plus-circle me-2"></i>➕ Ajouter un nouveau produit
+                </div>
+                <div class="card-body">
+                    <form id="formProduit" class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">ID</label>
+                            <input type="text" class="form-control form-control-custom" id="newID" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Prix (€)</label>
+                            <input type="number" step="0.01" class="form-control form-control-custom" id="newPrix" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Qté</label>
+                            <input type="number" class="form-control form-control-custom" id="newQte" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Remise %</label>
+                            <input type="number" min="0" max="100" class="form-control form-control-custom" id="newRemise" value="0" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">&nbsp;</label>
+                            <button type="submit" class="btn btn-success-glow btn-glow w-100">
+                                <i class="fas fa-plus me-2"></i>Ajouter
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">&nbsp;</label>
+                            <button type="button" class="btn btn-danger-glow btn-glow w-100" onclick="viderTout()">
+                                <i class="fas fa-trash me-2"></i>Vider
+                            </button>
+                        </div>
+                    </form>
+                    <div id="messageAjout" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Auto-refresh toutes les 30 secondes (optionnel)
-        // setInterval(() => location.reload(), 30000);
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let ventes = [
+    {id: 'PROD001', prix: 29.99, qte: 50, remise: 5},
+    {id: 'PROD002', prix: 49.99, qte: 30, remise: 10},
+    {id: 'PROD003', prix: 19.99, qte: 100, remise: 0},
+    {id: 'PROD004', prix: 99.99, qte: 15, remise: 20},
+    {id: 'PROD005', prix: 39.99, qte: 25, remise: 8},
+    {id: 'PROD006', prix: 59.99, qte: 40, remise: 15},
+    {id: 'PROD007', prix: 79.99, qte: 35, remise: 3},
+    {id: 'PROD008', prix: 15.99, qte: 80, remise: 12},
+    {id: 'PROD009', prix: 89.99, qte: 12, remise: 25},
+    {id: 'PROD010', prix: 24.99, qte: 60, remise: 7}
+];
+
+function calculerLigne(produit) {
+    const caBrut = produit.prix * produit.qte;
+    const caNet = caBrut * (1 - produit.remise / 100);
+    const tva = caNet * 0.20;
+    return { ...produit, caBrut: caBrut.toFixed(2), caNet: caNet.toFixed(2), tva: tva.toFixed(2) };
+}
+
+function calculerTout() {
+    const produits = ventes.map(calculerLigne);
+    const totalCA = produits.reduce((sum, p) => sum + parseFloat(p.caNet), 0);
+    
+    // Mettre à jour stats
+    document.getElementById('caTotal').textContent = totalCA.toLocaleString('fr-FR') + ' €';
+    document.getElementById('nbProduits').textContent = produits.length;
+    document.getElementById('dateAnalyse').textContent = new Date().toLocaleString('fr-FR');
+    
+    // Afficher tableau
+    afficherTableau(produits);
+    
+    // TOP 5
+    const top5 = produits.sort((a,b) => parseFloat(b.caNet) - parseFloat(a.caNet)).slice(0,5);
+    afficherTop5(top5);
+    
+    // Top produit
+    document.getElementById('topProduit').textContent = top5[0].id;
+    
+    localStorage.setItem('ventes', JSON.stringify(ventes));
+}
+
+function afficherTableau(produits) {
+    const tbody = document.getElementById('tbodyVentes');
+    tbody.innerHTML = produits.map(p => `
+        <tr>
+            <td><strong>${p.id}</strong></td>
+            <td>${parseFloat(p.prix).toLocaleString('fr-FR')}</td>
+            <td>${p.qte}</td>
+            <td>${p.remise}%</td>
+            <td>${parseFloat(p.caBrut).toLocaleString('fr-FR')}</td>
+            <td class="text-success fw-bold">${parseFloat(p.caNet).toLocaleString('fr-FR')}</td>
+            <td>${parseFloat(p.tva).toLocaleString('fr-FR')}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="supprimer('${p.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function afficherTop5(top5) {
+    document.getElementById('top5').innerHTML = top5.map((p, i) => `
+        <div class="top-produit-item p-3 mb-2 rounded">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <strong>#${p.id}</strong><br>
+                    <small class="text-muted">${p.qte} unités</small>
+                </div>
+                <div class="text-end">
+                    <div class="fw-bold text-success">${parseFloat(p.caNet).toLocaleString('fr-FR')} €</div>
+                    <small class="badge bg-primary">${i+1}</small>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function exportCSV() {
+    const produits = ventes.map(calculerLigne);
+    let csv = 'ID,Prix,Quantite,Remise,CA_Brut,CA_Net,TVA\n';
+    csv += produits.map(p => 
+        `${p.id},${p.prix},${p.qte},${p.remise},${p.caBrut},${p.caNet},${p.tva}`
+    ).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ventes_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+}
+
+function exportJSON() {
+    const data = ventes.map(calculerLigne);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ventes_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+}
+
+document.getElementById('formProduit').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nouveau = {
+        id: document.getElementById('newID').value,
+        prix: parseFloat(document.getElementById('newPrix').value),
+        qte: parseInt(document.getElementById('newQte').value),
+        remise: parseFloat(document.getElementById('newRemise').value)
+    };
+    
+    if (ventes.find(p => p.id === nouveau.id)) {
+        showMessage('ID existe déjà !', 'danger');
+        return;
+    }
+    
+    ventes.push(nouveau);
+    calculerTout();
+    showMessage(`✅ ${nouveau.id} ajouté !`, 'success');
+    this.reset();
+});
+
+function supprimer(id) {
+    if (confirm('Supprimer ce produit ?')) {
+        ventes = ventes.filter(p => p.id !== id);
+        calculerTout();
+        showMessage('🗑️ Produit supprimé', 'warning');
+    }
+}
+
+function viderTout() {
+    if (confirm('Vider TOUS les produits ?')) {
+        ventes = [];
+        calculerTout();
+        showMessage('🧹 Tout vidé !', 'secondary');
+    }
+}
+
+function showMessage(text, type) {
+    const msg = document.getElementById('messageAjout');
+    msg.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show">
+        ${text}
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+    </div>`;
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    const saved = localStorage.getItem('ventes');
+    if (saved) ventes = JSON.parse(saved);
+    calculerTout();
+});
+</script>
+
 </body>
 </html>
