@@ -36,6 +36,21 @@ def traiter_fichier(fichier):
     df.to_csv("resultats_final.csv", index=False)
 
     print("✅ Fichier généré : resultats_final.csv")
+    # 📈 Données pour graphique
+        ids = df['ID'].tolist()
+        ca_values = df['CA_Net'].tolist()
+
+        return render_template(
+            "index.html",
+            table=table_html,
+            ca_total=round(ca_total, 2),
+            produit_max=produit_max,
+            ids=ids,
+            ca_values=ca_values
+        )
+
+    except Exception as e:
+        return render_template("error.html", message=str(e))
 
 if __name__ == "__main__":
     traiter_fichier("ventes.csv")
