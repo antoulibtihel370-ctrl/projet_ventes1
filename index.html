@@ -6,6 +6,7 @@
     <title>Analyse des Ventes PRO - Hors ligne</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --primary: #4CAF50;
@@ -61,6 +62,7 @@
             box-shadow: 0 10px 25px rgba(76,175,80,0.4);
         }
         .btn-danger-glow { background: linear-gradient(45deg, var(--danger), #d32f2f); }
+        .btn-info-glow { background: linear-gradient(45deg, #2196F3, #1976D2); }
         .table-custom th {
             background: var(--primary) !important;
             color: white;
@@ -80,13 +82,27 @@
             background: linear-gradient(90deg, #e3f2fd, #bbdefb);
             transform: translateX(10px);
         }
+        .graphique-section {
+            margin-top: 2rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white;
+        }
+        #chartCA {
+            max-height: 400px !important;
+        }
     </style>
 </head>
 <body>
 
 <div class="header text-center">
     <h1><i class="fas fa-chart-line me-3"></i>📊 Analyse des Ventes PRO</h1>
-    <p class="lead mb-0">Gestion complète - 100% Hors ligne</p>
+    <p class="lead mb-0">Gestion complète - Graphique DYNAMIQUE</p>
 </div>
 
 <div class="container-main">
@@ -109,27 +125,28 @@
         <div class="col-lg-3 col-md-6">
             <div class="card card-modern bg-white text-center p-4">
                 <i class="fas fa-download fa-3x text-info mb-3"></i>
-                <div class="stat-big">2 156</div>
+                <div class="stat-big" id="nbLignes">2 156</div>
                 <div class="text-muted">Lignes exportées</div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
             <button class="btn btn-success-glow btn-glow w-100 h-100" onclick="calculerTout()">
-                <i class="fas fa-magic me-2"></i>Rafraîchir
+                <i class="fas fa-magic me-2"></i>🔄 Rafraîchir
             </button>
         </div>
     </div>
 
     <div class="row g-4">
-        <!-- Tableau principal -->
+        <!-- Colonne gauche : Tableau + Graphique DYNAMIQUE -->
         <div class="col-lg-8">
+            <!-- Tableau principal -->
             <div class="card card-modern">
                 <div class="card-header-custom p-3">
                     <i class="fas fa-table me-2"></i>📋 Toutes les Ventes
                     <span class="badge bg-light text-dark ms-2" id="nbProduits">15</span>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive" id="tableauVentes">
+                    <div class="table-responsive" id="tableauVentes" style="max-height: 500px;">
                         <table class="table table-hover table-custom mb-0">
                             <thead>
                                 <tr>
@@ -144,9 +161,34 @@
                                 </tr>
                             </thead>
                             <tbody id="tbodyVentes">
-                                <!-- Données générées par JS -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRAPHIQUE DYNAMIQUE -->
+            <div class="graphique-section">
+                <div class="card card-modern">
+                    <div class="card-header-custom p-3">
+                        <i class="fas fa-chart-mixed me-2"></i>📈 CA Net DYNAMIQUE 
+                        <span class="badge bg-success ms-2" id="graphUpdate">Mis à jour</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="chart-container mb-3">
+                            <canvas id="chartCA"></canvas>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-success-glow btn-glow me-2" onclick="toggleChartType()">
+                                <i class="fas fa-exchange-alt me-2"></i>Changer Type
+                            </button>
+                            <button class="btn btn-info-glow btn-glow me-2" onclick="exportChartPNG()">
+                                <i class="fas fa-camera me-2"></i>PNG Graphique
+                            </button>
+                            <a href="resultats_final.csv" class="btn btn-warning btn-glow" download>
+                                <i class="fas fa-file-csv me-2"></i>Résultats Python
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,7 +202,6 @@
                     <i class="fas fa-star me-2"></i>🏆 TOP 5 Produits
                 </div>
                 <div class="card-body p-3" id="top5">
-                    <!-- Généré par JS -->
                 </div>
             </div>
 
@@ -170,27 +211,19 @@
                     <i class="fas fa-history me-2"></i>📜 Historique
                 </div>
                 <div class="card-body p-3" style="max-height: 250px; overflow-y: auto;" id="historique">
-                    <div class="alert alert-info small mb-2">
-                        <i class="fas fa-clock me-2"></i>Dernière analyse : <span id="dateAnalyse"></span>
-                    </div>
-                    <div class="small text-muted">
-                        - 15 produits analysés<br>
-                        - CA total : 1 245,67 €<br>
-                        - Fichier prêt au téléchargement
-                    </div>
                 </div>
             </div>
 
             <!-- Téléchargements -->
             <div class="card card-modern">
                 <div class="card-header-custom p-3">
-                    <i class="fas fa-download me-2"></i>💾 Téléchargements
+                    <i class="fas fa-download me-2"></i>💾 Export
                 </div>
                 <div class="card-body text-center p-4">
-                    <button class="btn btn-success-glow btn-glow me-2 mb-2" onclick="exportCSV()">
+                    <button class="btn btn-success-glow btn-glow w-100 mb-2" onclick="exportCSV()">
                         <i class="fas fa-file-csv me-2"></i>CSV Complet
-                    </button><br>
-                    <button class="btn btn-info btn-glow" onclick="exportJSON()">
+                    </button>
+                    <button class="btn btn-info-glow btn-glow w-100" onclick="exportJSON()">
                         <i class="fas fa-file-code me-2"></i>JSON
                     </button>
                 </div>
@@ -203,7 +236,7 @@
         <div class="col-12">
             <div class="card card-modern">
                 <div class="card-header-custom p-3">
-                    <i class="fas fa-plus-circle me-2"></i>➕ Ajouter un nouveau produit
+                    <i class="fas fa-plus-circle me-2"></i>➕ Ajouter Produit
                 </div>
                 <div class="card-body">
                     <form id="formProduit" class="row g-3">
@@ -224,15 +257,13 @@
                             <input type="number" min="0" max="100" class="form-control form-control-custom" id="newRemise" value="0" required>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">&nbsp;</label>
-                            <button type="submit" class="btn btn-success-glow btn-glow w-100">
+                            <button type="submit" class="btn btn-success-glow btn-glow w-100 mt-4">
                                 <i class="fas fa-plus me-2"></i>Ajouter
                             </button>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">&nbsp;</label>
-                            <button type="button" class="btn btn-danger-glow btn-glow w-100" onclick="viderTout()">
-                                <i class="fas fa-trash me-2"></i>Vider
+                            <button type="button" class="btn btn-danger-glow btn-glow w-100 mt-4" onclick="viderTout()">
+                                <i class="fas fa-trash me-2"></i>Vider Tout
                             </button>
                         </div>
                     </form>
@@ -258,33 +289,124 @@ let ventes = [
     {id: 'PROD010', prix: 24.99, qte: 60, remise: 7}
 ];
 
-function calculerLigne(produit) {
-    const caBrut = produit.prix * produit.qte;
-    const caNet = caBrut * (1 - produit.remise / 100);
-    const tva = caNet * 0.20;
-    return { ...produit, caBrut: caBrut.toFixed(2), caNet: caNet.toFixed(2), tva: tva.toFixed(2) };
-}
+let chartInstance = null;
+let chartType = 'bar'; // 'bar' ou 'line'
 
+// 🔥 FONCTION PRINCIPALE - MET À JOUR TOUT
 function calculerTout() {
     const produits = ventes.map(calculerLigne);
     const totalCA = produits.reduce((sum, p) => sum + parseFloat(p.caNet), 0);
     
-    // Mettre à jour stats
+    // Stats principales
     document.getElementById('caTotal').textContent = totalCA.toLocaleString('fr-FR') + ' €';
     document.getElementById('nbProduits').textContent = produits.length;
+    document.getElementById('nbLignes').textContent = produits.length;
     document.getElementById('dateAnalyse').textContent = new Date().toLocaleString('fr-FR');
+    document.getElementById('graphUpdate').textContent = 'Mis à jour';
     
-    // Afficher tableau
+    // Tableaux
     afficherTableau(produits);
+    afficherTop5(produits);
+    afficherHistorique(produits, totalCA);
     
-    // TOP 5
-    const top5 = produits.sort((a,b) => parseFloat(b.caNet) - parseFloat(a.caNet)).slice(0,5);
-    afficherTop5(top5);
-    
-    // Top produit
-    document.getElementById('topProduit').textContent = top5[0].id;
+    // 🔥 GRAPHIQUE DYNAMIQUE
+    updateGraphique(produits);
     
     localStorage.setItem('ventes', JSON.stringify(ventes));
+}
+
+function calculerLigne(produit) {
+    const caBrut = produit.prix * produit.qte;
+    const caNet = caBrut * (1 - produit.remise / 100);
+    const tva = caNet * 0.20;
+    return { ...produit, caBrut: parseFloat(caBrut.toFixed(2)), caNet: parseFloat(caNet.toFixed(2)), tva: parseFloat(tva.toFixed(2)) };
+}
+
+function updateGraphique(produits) {
+    const ctx = document.getElementById('chartCA').getContext('2d');
+    const labels = produits.map(p => p.id);
+    const dataCA = produits.map(p => p.caNet);
+    
+    // Détruit l'ancien graphique
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    
+    // Crée le NOUVEAU graphique
+    chartInstance = new Chart(ctx, {
+        type: chartType,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'CA Net (€)',
+                data: dataCA,
+                backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 3,
+                tension: chartType === 'line' ? 0.4 : 0,
+                fill: chartType === 'bar' ? true : 'origin',
+                barPercentage: 0.8,
+                categoryPercentage: 0.9
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { size: 14, weight: 'bold' } }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.9)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    callbacks: {
+                        label: function(context) {
+                            return `CA Net: ${context.parsed.y.toLocaleString('fr-FR')} €`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return value.toLocaleString('fr-FR') + ' €'; }
+                    }
+                },
+                x: {
+                    ticks: { maxRotation: 45 }
+                }
+            },
+            animation: {
+                duration: 800,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+    
+    // Met à jour le badge
+    setTimeout(() => {
+        document.getElementById('graphUpdate').textContent = 'Live';
+        document.getElementById('graphUpdate').className = 'badge bg-success ms-2';
+    }, 1000);
+}
+
+function toggleChartType() {
+    chartType = chartType === 'bar' ? 'line' : 'bar';
+    const produits = ventes.map(calculerLigne);
+    updateGraphique(produits);
+}
+
+function exportChartPNG() {
+    if (chartInstance) {
+        const link = document.createElement('a');
+        link.download = `graphique_ventes_${new Date().toISOString().split('T')[0]}.png`;
+        link.href = chartInstance.toBase64Image();
+        link.click();
+    }
 }
 
 function afficherTableau(produits) {
@@ -292,12 +414,12 @@ function afficherTableau(produits) {
     tbody.innerHTML = produits.map(p => `
         <tr>
             <td><strong>${p.id}</strong></td>
-            <td>${parseFloat(p.prix).toLocaleString('fr-FR')}</td>
+            <td>${p.prix.toLocaleString('fr-FR')}</td>
             <td>${p.qte}</td>
             <td>${p.remise}%</td>
-            <td>${parseFloat(p.caBrut).toLocaleString('fr-FR')}</td>
-            <td class="text-success fw-bold">${parseFloat(p.caNet).toLocaleString('fr-FR')}</td>
-            <td>${parseFloat(p.tva).toLocaleString('fr-FR')}</td>
+            <td>${p.caBrut.toLocaleString('fr-FR')}</td>
+            <td class="text-success fw-bold">${p.caNet.toLocaleString('fr-FR')}</td>
+            <td>${p.tva.toLocaleString('fr-FR')}</td>
             <td>
                 <button class="btn btn-sm btn-outline-danger" onclick="supprimer('${p.id}')">
                     <i class="fas fa-trash"></i>
@@ -307,7 +429,8 @@ function afficherTableau(produits) {
     `).join('');
 }
 
-function afficherTop5(top5) {
+function afficherTop5(produits) {
+    const top5 = produits.sort((a,b) => b.caNet - a.caNet).slice(0,5);
     document.getElementById('top5').innerHTML = top5.map((p, i) => `
         <div class="top-produit-item p-3 mb-2 rounded">
             <div class="d-flex justify-content-between">
@@ -316,55 +439,74 @@ function afficherTop5(top5) {
                     <small class="text-muted">${p.qte} unités</small>
                 </div>
                 <div class="text-end">
-                    <div class="fw-bold text-success">${parseFloat(p.caNet).toLocaleString('fr-FR')} €</div>
+                    <div class="fw-bold text-success">${p.caNet.toLocaleString('fr-FR')} €</div>
                     <small class="badge bg-primary">${i+1}</small>
                 </div>
             </div>
         </div>
     `).join('');
+    
+    document.getElementById('topProduit').textContent = top5[0]?.id || 'Aucun';
 }
 
+function afficherHistorique(produits, totalCA) {
+    document.getElementById('historique').innerHTML = `
+        <div class="alert alert-info small mb-2">
+            <i class="fas fa-clock me-2"></i>Dernière analyse : <span id="dateAnalyse">${new Date().toLocaleString('fr-FR')}</span>
+        </div>
+        <div class="small text-muted">
+            <strong>${produits.length} produits</strong><br>
+            CA total : <strong>${totalCA.toLocaleString('fr-FR')} €</strong><br>
+            🟢 Graphique live - mise à jour automatique
+        </div>
+    `;
+}
+
+// Export CSV/JSON
 function exportCSV() {
     const produits = ventes.map(calculerLigne);
     let csv = 'ID,Prix,Quantite,Remise,CA_Brut,CA_Net,TVA\n';
     csv += produits.map(p => 
-        `${p.id},${p.prix},${p.qte},${p.remise},${p.caBrut},${p.caNet},${p.tva}`
+        `"${p.id}",${p.prix},${p.qte},${p.remise},${p.caBrut},${p.caNet},${p.tva}`
     ).join('\n');
     
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `ventes_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
+    URL.revokeObjectURL(url);
 }
 
 function exportJSON() {
     const data = ventes.map(calculerLigne);
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `ventes_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
+    URL.revokeObjectURL(url);
 }
 
+// Événements
 document.getElementById('formProduit').addEventListener('submit', function(e) {
     e.preventDefault();
     const nouveau = {
-        id: document.getElementById('newID').value,
+        id: document.getElementById('newID').value.trim(),
         prix: parseFloat(document.getElementById('newPrix').value),
         qte: parseInt(document.getElementById('newQte').value),
         remise: parseFloat(document.getElementById('newRemise').value)
     };
     
-    if (ventes.find(p => p.id === nouveau.id)) {
-        showMessage('ID existe déjà !', 'danger');
+    if (!nouveau.id || ventes.find(p => p.id === nouveau.id)) {
+        showMessage('❌ ID invalide ou existe déjà !', 'danger');
         return;
     }
     
     ventes.push(nouveau);
-    calculerTout();
+    calculerTout(); // 🔥 MET À JOUR GRAPHIQUE AUTOMATIQUEMENT
     showMessage(`✅ ${nouveau.id} ajouté !`, 'success');
     this.reset();
 });
@@ -372,7 +514,7 @@ document.getElementById('formProduit').addEventListener('submit', function(e) {
 function supprimer(id) {
     if (confirm('Supprimer ce produit ?')) {
         ventes = ventes.filter(p => p.id !== id);
-        calculerTout();
+        calculerTout(); // 🔥 MET À JOUR GRAPHIQUE AUTOMATIQUEMENT
         showMessage('🗑️ Produit supprimé', 'warning');
     }
 }
@@ -380,24 +522,30 @@ function supprimer(id) {
 function viderTout() {
     if (confirm('Vider TOUS les produits ?')) {
         ventes = [];
-        calculerTout();
+        calculerTout(); // 🔥 MET À JOUR GRAPHIQUE AUTOMATIQUEMENT
         showMessage('🧹 Tout vidé !', 'secondary');
     }
 }
 
 function showMessage(text, type) {
     const msg = document.getElementById('messageAjout');
-    msg.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show">
+    msg.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show small">
         ${text}
-        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>`;
 }
 
-// Initialisation
+// INITIALISATION
 document.addEventListener('DOMContentLoaded', function() {
     const saved = localStorage.getItem('ventes');
-    if (saved) ventes = JSON.parse(saved);
-    calculerTout();
+    if (saved) {
+        try {
+            ventes = JSON.parse(saved);
+        } catch(e) {
+            console.log('Données corrompues, réinitialisation');
+        }
+    }
+    calculerTout(); // 🔥 LANCE LE GRAPHIQUE
 });
 </script>
 
