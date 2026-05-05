@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -93,16 +94,13 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             background: white;
         }
-        #chartCA {
-            max-height: 400px !important;
-        }
     </style>
 </head>
 <body>
 
 <div class="header text-center">
     <h1><i class="fas fa-chart-line me-3"></i>📊 Analyse des Ventes PRO</h1>
-    <p class="lead mb-0">Gestion complète - Graphique DYNAMIQUE</p>
+    <p class="lead mb-0">🔥 VALEURS IDENTIQUES PARTOUT - Graphique DYNAMIQUE</p>
 </div>
 
 <div class="container-main">
@@ -111,21 +109,21 @@
         <div class="col-lg-3 col-md-6">
             <div class="card card-modern bg-white text-center p-4">
                 <i class="fas fa-euro-sign fa-3x text-success mb-3"></i>
-                <div class="stat-big" id="caTotal">1 245,67 €</div>
+                <div class="stat-big" id="caTotal">0 €</div>
                 <div class="text-muted">CA Total</div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
             <div class="card card-modern bg-white text-center p-4">
                 <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
-                <div class="stat-big text-primary" id="topProduit">PROD007</div>
+                <div class="stat-big text-primary" id="topProduit">Aucun</div>
                 <div class="text-muted">Top Produit</div>
             </div>
         </div>
         <div class="col-lg-3 col-md-6">
             <div class="card card-modern bg-white text-center p-4">
                 <i class="fas fa-download fa-3x text-info mb-3"></i>
-                <div class="stat-big" id="nbLignes">2 156</div>
+                <div class="stat-big" id="nbLignes">0</div>
                 <div class="text-muted">Lignes exportées</div>
             </div>
         </div>
@@ -143,7 +141,7 @@
             <div class="card card-modern">
                 <div class="card-header-custom p-3">
                     <i class="fas fa-table me-2"></i>📋 Toutes les Ventes
-                    <span class="badge bg-light text-dark ms-2" id="nbProduits">15</span>
+                    <span class="badge bg-light text-dark ms-2" id="nbProduits">0</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive" id="tableauVentes" style="max-height: 500px;">
@@ -161,6 +159,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tbodyVentes">
+                                <tr><td colspan="8" class="text-center text-muted py-5">Aucune vente - Ajoutez votre premier produit !</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -172,7 +171,7 @@
                 <div class="card card-modern">
                     <div class="card-header-custom p-3">
                         <i class="fas fa-chart-mixed me-2"></i>📈 CA Net DYNAMIQUE 
-                        <span class="badge bg-success ms-2" id="graphUpdate">Mis à jour</span>
+                        <span class="badge bg-success ms-2" id="graphUpdate">Prêt</span>
                     </div>
                     <div class="card-body p-4">
                         <div class="chart-container mb-3">
@@ -202,6 +201,10 @@
                     <i class="fas fa-star me-2"></i>🏆 TOP 5 Produits
                 </div>
                 <div class="card-body p-3" id="top5">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-star fa-2x mb-3 opacity-50"></i>
+                        <p>Aucun produit</p>
+                    </div>
                 </div>
             </div>
 
@@ -211,6 +214,10 @@
                     <i class="fas fa-history me-2"></i>📜 Historique
                 </div>
                 <div class="card-body p-3" style="max-height: 250px; overflow-y: auto;" id="historique">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-clock fa-2x mb-3 opacity-50"></i>
+                        <p>Aucune analyse</p>
+                    </div>
                 </div>
             </div>
 
@@ -276,63 +283,73 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let ventes = [
-    {id: 'PROD001', prix: 29.99, qte: 50, remise: 5},
-    {id: 'PROD002', prix: 49.99, qte: 30, remise: 10},
-    {id: 'PROD003', prix: 19.99, qte: 100, remise: 0},
-    {id: 'PROD004', prix: 99.99, qte: 15, remise: 20},
-    {id: 'PROD005', prix: 39.99, qte: 25, remise: 8},
-    {id: 'PROD006', prix: 59.99, qte: 40, remise: 15},
-    {id: 'PROD007', prix: 79.99, qte: 35, remise: 3},
-    {id: 'PROD008', prix: 15.99, qte: 80, remise: 12},
-    {id: 'PROD009', prix: 89.99, qte: 12, remise: 25},
-    {id: 'PROD010', prix: 24.99, qte: 60, remise: 7}
-];
+let ventes = []; // 🔥 TABLEAU VIDE - AUCUNE DONNÉE PAR DÉFAUT
 
 let chartInstance = null;
-let chartType = 'bar'; // 'bar' ou 'line'
+let chartType = 'bar';
 
-// 🔥 FONCTION PRINCIPALE - MET À JOUR TOUT
+// 🔥 FONCTION PRINCIPALE - SYNCHRONISE TOUT
 function calculerTout() {
     const produits = ventes.map(calculerLigne);
     const totalCA = produits.reduce((sum, p) => sum + parseFloat(p.caNet), 0);
     
-    // Stats principales
+    console.log('🔥 SYNCHRO - Produits:', produits.length, 'CA:', totalCA);
+    
+    // ✅ STATS PRINCIPALES - MÊMES VALEURS
     document.getElementById('caTotal').textContent = totalCA.toLocaleString('fr-FR') + ' €';
     document.getElementById('nbProduits').textContent = produits.length;
     document.getElementById('nbLignes').textContent = produits.length;
-    document.getElementById('dateAnalyse').textContent = new Date().toLocaleString('fr-FR');
-    document.getElementById('graphUpdate').textContent = 'Mis à jour';
     
-    // Tableaux
+    // ✅ TOP PRODUIT
+    const top1 = produits.sort((a,b) => b.caNet - a.caNet)[0];
+    document.getElementById('topProduit').textContent = top1?.id || 'Aucun';
+    
+    // ✅ TOUS LES TABLEAUX
     afficherTableau(produits);
     afficherTop5(produits);
     afficherHistorique(produits, totalCA);
     
-    // 🔥 GRAPHIQUE DYNAMIQUE
+    // ✅ GRAPHIQUE SYNCHRONISÉ
     updateGraphique(produits);
     
+    // ✅ SAUVEGARDE
     localStorage.setItem('ventes', JSON.stringify(ventes));
+    
+    console.log('✅ TOUT SYNCHRONISÉ!');
 }
 
 function calculerLigne(produit) {
     const caBrut = produit.prix * produit.qte;
     const caNet = caBrut * (1 - produit.remise / 100);
     const tva = caNet * 0.20;
-    return { ...produit, caBrut: parseFloat(caBrut.toFixed(2)), caNet: parseFloat(caNet.toFixed(2)), tva: parseFloat(tva.toFixed(2)) };
+    return { 
+        ...produit, 
+        caBrut: parseFloat(caBrut.toFixed(2)), 
+        caNet: parseFloat(caNet.toFixed(2)), 
+        tva: parseFloat(tva.toFixed(2)) 
+    };
 }
 
 function updateGraphique(produits) {
     const ctx = document.getElementById('chartCA').getContext('2d');
-    const labels = produits.map(p => p.id);
-    const dataCA = produits.map(p => p.caNet);
     
-    // Détruit l'ancien graphique
     if (chartInstance) {
         chartInstance.destroy();
     }
     
-    // Crée le NOUVEAU graphique
+    if (produits.length === 0) {
+        // Graphique vide synchronisé
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: [], datasets: [{ data: [], label: 'CA Net (€)' }] },
+            options: { plugins: { legend: { display: false } } }
+        });
+        return;
+    }
+    
+    const labels = produits.map(p => p.id);
+    const dataCA = produits.map(p => p.caNet);
+    
     chartInstance = new Chart(ctx, {
         type: chartType,
         data: {
@@ -343,55 +360,18 @@ function updateGraphique(produits) {
                 backgroundColor: 'rgba(76, 175, 80, 0.7)',
                 borderColor: 'rgba(76, 175, 80, 1)',
                 borderWidth: 3,
-                tension: chartType === 'line' ? 0.4 : 0,
-                fill: chartType === 'bar' ? true : 'origin',
-                barPercentage: 0.8,
-                categoryPercentage: 0.9
+                tension: chartType === 'line' ? 0.4 : 0
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { font: { size: 14, weight: 'bold' } }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.9)',
-                    titleColor: 'white',
-                    bodyColor: 'white',
-                    callbacks: {
-                        label: function(context) {
-                            return `CA Net: ${context.parsed.y.toLocaleString('fr-FR')} €`;
-                        }
-                    }
-                }
-            },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) { return value.toLocaleString('fr-FR') + ' €'; }
-                    }
-                },
-                x: {
-                    ticks: { maxRotation: 45 }
-                }
-            },
-            animation: {
-                duration: 800,
-                easing: 'easeInOutQuart'
+                y: { beginAtZero: true, ticks: { callback: value => value.toLocaleString('fr-FR') + ' €' } },
+                x: { ticks: { maxRotation: 45 } }
             }
         }
     });
-    
-    // Met à jour le badge
-    setTimeout(() => {
-        document.getElementById('graphUpdate').textContent = 'Live';
-        document.getElementById('graphUpdate').className = 'badge bg-success ms-2';
-    }, 1000);
 }
 
 function toggleChartType() {
@@ -411,6 +391,11 @@ function exportChartPNG() {
 
 function afficherTableau(produits) {
     const tbody = document.getElementById('tbodyVentes');
+    if (produits.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-5">Aucune vente - Ajoutez votre premier produit !</td></tr>';
+        return;
+    }
+    
     tbody.innerHTML = produits.map(p => `
         <tr>
             <td><strong>${p.id}</strong></td>
@@ -431,7 +416,19 @@ function afficherTableau(produits) {
 
 function afficherTop5(produits) {
     const top5 = produits.sort((a,b) => b.caNet - a.caNet).slice(0,5);
-    document.getElementById('top5').innerHTML = top5.map((p, i) => `
+    const container = document.getElementById('top5');
+    
+    if (top5.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-star fa-2x mb-3 opacity-50"></i>
+                <p>Aucun produit</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = top5.map((p, i) => `
         <div class="top-produit-item p-3 mb-2 rounded">
             <div class="d-flex justify-content-between">
                 <div>
@@ -440,35 +437,42 @@ function afficherTop5(produits) {
                 </div>
                 <div class="text-end">
                     <div class="fw-bold text-success">${p.caNet.toLocaleString('fr-FR')} €</div>
-                    <small class="badge bg-primary">${i+1}</small>
+                    <small class="badge bg-primary">${i+1}ᵉ</small>
                 </div>
             </div>
         </div>
     `).join('');
-    
-    document.getElementById('topProduit').textContent = top5[0]?.id || 'Aucun';
 }
 
 function afficherHistorique(produits, totalCA) {
-    document.getElementById('historique').innerHTML = `
+    const container = document.getElementById('historique');
+    if (produits.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-clock fa-2x mb-3 opacity-50"></i>
+                <p>Aucune analyse</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
         <div class="alert alert-info small mb-2">
-            <i class="fas fa-clock me-2"></i>Dernière analyse : <span id="dateAnalyse">${new Date().toLocaleString('fr-FR')}</span>
+            <i class="fas fa-clock me-2"></i>Dernière analyse : ${new Date().toLocaleString('fr-FR')}
         </div>
         <div class="small text-muted">
             <strong>${produits.length} produits</strong><br>
             CA total : <strong>${totalCA.toLocaleString('fr-FR')} €</strong><br>
-            🟢 Graphique live - mise à jour automatique
+            🟢 Graphique live - <strong>${produits.length} produits affichés</strong>
         </div>
     `;
 }
 
-// Export CSV/JSON
+// Export
 function exportCSV() {
     const produits = ventes.map(calculerLigne);
     let csv = 'ID,Prix,Quantite,Remise,CA_Brut,CA_Net,TVA\n';
-    csv += produits.map(p => 
-        `"${p.id}",${p.prix},${p.qte},${p.remise},${p.caBrut},${p.caNet},${p.tva}`
-    ).join('\n');
+    csv += produits.map(p => `"${p.id}",${p.prix},${p.qte},${p.remise},${p.caBrut},${p.caNet},${p.tva}`).join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -506,23 +510,23 @@ document.getElementById('formProduit').addEventListener('submit', function(e) {
     }
     
     ventes.push(nouveau);
-    calculerTout(); // 🔥 MET À JOUR GRAPHIQUE AUTOMATIQUEMENT
-    showMessage(`✅ ${nouveau.id} ajouté !`, 'success');
+    calculerTout(); // 🔥 SYNCHRONISE TOUT AUTOMATIQUEMENT
+    showMessage(`✅ ${nouveau.id} ajouté ! (${ventes.length} total)`, 'success');
     this.reset();
 });
 
 function supprimer(id) {
     if (confirm('Supprimer ce produit ?')) {
         ventes = ventes.filter(p => p.id !== id);
-        calculerTout(); // 🔥 MET À JOUR GRAPHIQUE AUTOMATIQUEMENT
-        showMessage('🗑️ Produit supprimé', 'warning');
+        calculerTout(); // 🔥 SYNCHRONISE TOUT
+        showMessage(`🗑️ Supprimé (${ventes.length} restant)`, 'warning');
     }
 }
 
 function viderTout() {
     if (confirm('Vider TOUS les produits ?')) {
         ventes = [];
-        calculerTout(); // 🔥 MET À JOUR GRAPHIQUE AUTOMATIQUEMENT
+        calculerTout(); // 🔥 SYNCHRONISE TOUT
         showMessage('🧹 Tout vidé !', 'secondary');
     }
 }
@@ -535,17 +539,23 @@ function showMessage(text, type) {
     </div>`;
 }
 
-// INITIALISATION
+// 🚀 INITIALISATION - TABLEAU VIDE
 document.addEventListener('DOMContentLoaded', function() {
+    // Charge depuis localStorage SI il existe
     const saved = localStorage.getItem('ventes');
     if (saved) {
         try {
             ventes = JSON.parse(saved);
+            console.log('📂 Données chargées:', ventes.length, 'produits');
         } catch(e) {
-            console.log('Données corrompues, réinitialisation');
+            console.log('⚠️ Données corrompues, démarrage vide');
+            ventes = [];
         }
+    } else {
+        console.log('🆕 Démarrage avec tableau VIDE');
     }
-    calculerTout(); // 🔥 LANCE LE GRAPHIQUE
+    
+    calculerTout(); // 🔥 LANCE LA SYNCHRONISATION
 });
 </script>
 
